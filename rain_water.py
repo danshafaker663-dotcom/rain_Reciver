@@ -33,3 +33,35 @@ def trap(height: list[int]) -> int:
             right -= 1
 
     return total
+
+def trap_stack(height: list[int]) -> int:
+    """使用单调栈计算接雨水总量。
+
+    时间复杂度：O(n)
+    空间复杂度：O(n)
+    """
+    if any(type(value) is not int or value < 0 for value in height):
+        raise ValueError("柱子高度必须是非负整数")
+
+    stack: list[int] = []
+    total = 0
+
+    for right, current_height in enumerate(height):
+        # 当前柱子高于栈顶时，可能形成一个可以装水的凹槽。
+        while stack and current_height > height[stack[-1]]:
+            bottom = stack.pop()
+
+            # 没有左边界，无法形成凹槽。
+            if not stack:
+                break
+
+            left = stack[-1]
+            width = right - left - 1
+            water_height = (
+                min(height[left], current_height) - height[bottom]
+            )
+            total += width * water_height
+
+        stack.append(right)
+
+    return total
